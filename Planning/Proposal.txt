@@ -1,0 +1,78 @@
+Project Description:
+    The project i am proposing is called Slay the S(Py)er which is a 
+    turn based card battler rpg with rogue-like elements. This means that the combat style
+    will be turnbased and cards will be used as attacks or utitlity items to attack enemies in the game. Rogue-Like is a term to describe games
+    that restart your progress whenever your main character die.
+
+Similar Projects:
+    I'm basing this game on the similar game Slay the Spire which is going to look really similar to my finished product. The game will be similar.
+    Slay the Spire takes aspects from multiple other games which will be also included in this game.
+    Pokemon and Final Fantasy are famous for their turnbased systems which slay the spire based there off. However, a twist they added was the card
+    based system for gameplay. card essentially work as attacks and skills in pokemon except they have qaulties cards in real life have. Cards can be shuffled in a deck
+    more can be added and removed from a deck. Cards can also be discarded. Rogue-Like elements in the game is something i also want to add. Slay the Spire restarts your progress every single time you die however, the game
+    is short, but hard to make up for this. I want to add a similar system but maybe you get rewarded more for getting further into the game like getting some upgrades in later iterations.
+    in basic gameplay:
+        using cards as attacks and utitlity items 
+        having an energy system to determine how many actions you can do in a turn
+        having certain relics that impact gameplay either positvely or negatively for the player
+Structural Plan:
+    The way I plan to organize this project is starting with a main.py file
+    Then seperating files into main components
+    Below is the general structure of how the game will be constructed
+    the structure includes .py files and the classes specifically in that file and subclasses aswell
+    underneath will also include functions with a # describing what they do.
+        UI.py
+            This will include general UI which is alot to explain
+
+        Combat.py
+            Player class
+                PlayerHealth functiom
+                PlayerDeck property
+                PlayerCurrentCardPlayed property
+
+            Cards class
+                Cardcost property
+                CardImage property
+                CardAction Function
+            Opposition.py # will include an enemy list to register which enemys are there
+                Enemy Class
+                    Enemy subclasses
+            Attack State Machine:
+                Player:
+                    PlayerAttackTurn #Checks what card is currently being played and attacks enemy or does skill
+                    EffectsTurn: This turn for affects to be applied to the enemy happens right after the players turn but before the enemies
+                Enemy:
+                    First Checks an enemy array then goes and applies the skill they will do
+                    until the enemy turn is done
+                    EffectTurn: this turn is for applying status effects to the player or the enemy after the enemy turn
+
+        Map.py:
+            Map class
+                Level subClass
+                    Levels are either a battle, mystery, shop, rest, or boss
+                    #Mystery includes any random level for MVP
+Algorithimic Plan:
+    The hardest parts of the project will most likely be the card system, state machine for turn based combat, and saving data after a run
+        The way i will handle the card system is by seperating the cards into classes and specific types of cards into subclasses like attack and skill cards where attack cards will be used for attacking and skill cards are cast for skills.
+        I plan to make a list of these cards to create a deck where when a player clicks on card since the deck will show up on the screen showing the cards with a brief description the card will be cast player energy will be lost and the card will leave the current players hand
+        and and will be put back into the deck. The algorithim for animating this maybe complex with the current card leaving the list and going back into the deck list.
+        Another tough part is the statemachine for combat:
+            Combat will will consist starting with the players turn where the player will play cards until they decide they are done with their turn. They will click a button on their screen with end turn
+            then after that the player's effects will be put on enemy then it will be the enemies turn. 
+            Dealing with enemies will involve putting the enemies into a list with a random skill or attack they want to cast and casting their attacks from front to back.
+        Lastly, for saving data assuming that this is made in one file which it should. I after a run is done i'll try to make a temprorary text file listing the runs the player has done (this is a stretch and may not be in MVP)
+Time Line:
+    The most important part of the game which is the combat and the ui for that will be first to be worked on
+    so the game has a look to it
+    So this first week i'll be working on getting the player on the screen and getting the card system with cards to work
+    next week i'll work on enemies and getting the first level to be done
+    and on the third week i'll include extra elements with adding in the map and different level aswell as the boss for the player to fight.
+Version control:
+    Github and Git:
+        Image in the zipfile of the github
+Module List:
+    only cmu-graphics :)
+
+
+            
+
