@@ -40,11 +40,6 @@ class Card:
         drawImage(self.image, x, y,
                   width=self.rectCoords[0], height=self.rectCoords[1])
 
-    def castSkill(self, action):
-        # https://stackoverflow.com/questions/706721/how-do-i-pass-a-method-as-a-parameter-in-python
-        Action = action()
-        return Action
-
     def setCoords(self, x, y):
         self.x = x
         self.y = y
@@ -60,6 +55,9 @@ class AttackCard(Card):
     def __init__(self, image, energyCost, skill, name):
         super.__init__(image, energyCost, skill, name)
         super.cardType = "attack"
+
+    def attackEnemy():
+        return "Attack Enemy"
 
 
 class ColorlessCard(Card):

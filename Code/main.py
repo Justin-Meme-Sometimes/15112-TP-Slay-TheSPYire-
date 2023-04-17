@@ -4,6 +4,7 @@ from UI import Banner
 from card import Card
 from card import Deck
 from UI import Button
+from UI import Panel
 import os
 import pathlib
 
@@ -60,8 +61,15 @@ def endTurn():
     print("Turn Ended")
 
 
+def doDamage(defaulParameter):
+    print("Do damage!")
+
+
 def onMousePress(app, mouseX, mouseY):
-    app.d.isTouchingCard(app, mouseX, mouseY)
+    currentCard = app.d.isTouchingCard(app, mouseX, mouseY)
+    if currentCard != None:
+        currentCard.castSkill(doDamage(), None)
+
     if (app.et.isButtonClicked(app, mouseX, mouseY)):
         app.et.buttonAction(endTurn())
 
