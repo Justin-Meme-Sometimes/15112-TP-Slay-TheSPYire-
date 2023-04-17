@@ -44,7 +44,7 @@ class Banner:
             # print(i)
             for elem in i:
                 # print(elem)
-                print(elem[0])
+                # print(elem[0])
                 if isinstance(elem[0], str):
                     drawLabel(elem[0], elem[1], elem[2], size=20)
                 elif isinstance(elem[0], int):
