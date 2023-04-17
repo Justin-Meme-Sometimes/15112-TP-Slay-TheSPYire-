@@ -24,8 +24,13 @@ class Card:
 
     def isMouseTouching(self, app, mouseX, mouseY):
         # TODO check if the card is being touched by the mouse
-        if self.Rect.contains(mouseX, mouseY):
+        print(self.x, self.rectCoords[0]+self.x, mouseX)
+        print(self.y, self.y+self.rectCoords[1], mouseY)
+        if self.x <= mouseX <= self.rectCoords[0]+self.x and self.y <= mouseY <= self.rectCoords[1]+self.y:
+            print(f"{self} is being touched currently")
             return True
+        # if self.Rect.contains(mouseX, mouseY):
+            # return True
         return False
 
     def drawCard(self, app, x, y):
@@ -35,7 +40,7 @@ class Card:
         drawImage(self.image, x, y,
                   width=self.rectCoords[0], height=self.rectCoords[1])
 
-    def doAction(self, action):
+    def castSkill(self, action):
         # https://stackoverflow.com/questions/706721/how-do-i-pass-a-method-as-a-parameter-in-python
         Action = action()
         return Action
@@ -73,12 +78,18 @@ class Deck:
     def discard(self, card):
         if (isinstance(card, Card) or isinstance(card, SkillCard) or isinstance(card, AttackCard) or
                 isinstance(card, ColorlessCard)):
-            self.cardList.remove(card)
+            self.cards.remove(card)
+        return None
+
+    def isTouchingCard(self, app, mouseX, mouseY):
+        for card in self.cards:
+            if card.isMouseTouching(app, mouseX, mouseY):
+                return card
         return None
 
     def drawDeck(self, app):
         offsetX = 0
         for c in self.cards:
-            offsetX += 10
-            c.drawCard(app, offsetX+20, 50)
-            c.setCoords(offsetX+20, 50)
+            offsetX += 30
+            c.drawCard(app, offsetX+40, 330)
+            c.setCoords(offsetX+40, 330)
