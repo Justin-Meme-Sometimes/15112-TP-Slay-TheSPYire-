@@ -8,15 +8,19 @@ from enemy import Enemy
 
 
 class Card:
+    initial = 40
+
     def __init__(self, image, energyCost, skill, name, rectCoords, app):
         self.image = image
         self.energyCost = energyCost
         self.skill = skill
         self.name = name
         self.cardType = None
+        self.armor = 0
         self.rectCoords = rectCoords
-        self.x = None
-        self.y = None
+        self.x = Card.initial + 70
+        Card.initial += 40
+        self.y = 330
         self.clicked = False
 
     def __repr__(self):
@@ -46,6 +50,15 @@ class Card:
     def setCoords(self, x, y):
         self.x = x
         self.y = y
+
+    def attackEnemy(self, damageAmount, type, target):
+        if type == "Physical":
+            target.health = (target.health + target.armor) - damageAmount
+            damageDone = (target.health + target.armor) - damageAmount
+            return f"Damage Done was {damageDone}"
+        if type == "Poison":
+            target.effects["poision"] += 1
+            return f"Applied Poison to {target.name}"
 
 
 class SkillCard(Card):
@@ -82,6 +95,10 @@ class Deck:
     def shuffle(self):
         random.shuffle(self.cards)
 
+    def add(self, card,):
+        card.x = self.cards[-1].x + 40
+        self.cards.append(card)
+
     def discard(self, card):
         if (isinstance(card, Card) or isinstance(card, SkillCard) or isinstance(card, AttackCard) or
                 isinstance(card, ColorlessCard)):
@@ -98,13 +115,8 @@ class Deck:
         offsetX = 0
         for c in self.cards:
             offsetX += 40
-            # print(c, c.x, c.y)
-            if c.x == None or c.y == None:
-                c.drawCard(app, x + offsetX+70, 330)
-                c.setCoords(x + offsetX+70, 330)
-            else:
-                c.drawCard(app, c.x, c.y)
-                c.setCoords(c.x, c.y)
+            c.drawCard(app, c.x, c.y)
+            c.setCoords(c.x, c.y)
 
     def positionToNextCard(self, card, deck):
         # Measure the position of this card to the next card in the hand of cards
@@ -116,4 +128,4 @@ class Deck:
         for c in self.cards:
             offsetX += 40
             # print(c, c.x, c.y)
-            L.append((0 + offsetX+50, 330))
+            L.append((0 + offsetX+70, 330))

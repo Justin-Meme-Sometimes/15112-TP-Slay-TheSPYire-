@@ -7,7 +7,7 @@ class StateMachine:
         self.enemyList = enemyList
         self.turnCount = 1
         self.currentTurn = "Player Turn"
-        self.turnIterator = 0
+        self.turnIterator = 1
 
     def nextTurn(self, currentTurn):
         if self.turnCount % 4 == 0 and (self.turnIterator != 0 or self.turnIterator != 2):

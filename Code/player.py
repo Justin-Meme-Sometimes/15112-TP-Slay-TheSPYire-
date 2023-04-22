@@ -11,9 +11,13 @@ class Player:
         self.energy = energy
         self.cardPlayedPerTurn = cardPlayedPerTurn
         self.rectSize = rectSize
+        self.maxEnergy = 3
         self.image = image
         self.x = x
         self.y = y
+        self.strength = 0
+        self.dexerity = 0
+        self.currentShield = 0
         self.effects = {"poision": 0, "strength": 0, "dexterity": 0, }
 
     def drawPlayer(self):
