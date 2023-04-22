@@ -8,6 +8,7 @@ import random
 class Player:
     def __init__(self, health, energy, cardPlayedPerTurn, rectSize, image, x, y):
         self.health = health
+        self.maxHealth = health
         self.energy = energy
         self.cardPlayedPerTurn = cardPlayedPerTurn
         self.rectSize = rectSize
@@ -16,8 +17,8 @@ class Player:
         self.x = x
         self.y = y
         self.strength = 0
-        self.dexerity = 0
-        self.currentShield = 0
+        self.dex = 0
+        self.currentDefense = 0
         self.effects = {"poision": 0, "strength": 0, "dexterity": 0, }
 
     def drawPlayer(self):
@@ -26,3 +27,6 @@ class Player:
         temp = Image.open(self.image)
         drawImage(self.image, self.x, self.y,
                   width=self.rectSize[0], height=self.rectSize[1])
+
+    def isPlayerAlive(self):
+        return self.health >= 0

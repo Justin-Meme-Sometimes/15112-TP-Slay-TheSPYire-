@@ -9,6 +9,7 @@ from player import Player
 class Enemy:
     def __init__(self, name, health, image, hitSpriteSheet, type, x, y, rectCoords, defenseRange, attackRange, empowerRange, empowerType, debuffRange):
         self.name = name
+        self.maxHealth = health
         self.health = health
         self.image = image
         self.hitSpriteSheet = hitSpriteSheet
@@ -16,10 +17,10 @@ class Enemy:
         self.x = x
         self.y = y
         self.currentDefense = 0
-        self.armor = self.currentDefense
+        self.armor = 0
         self.rectCoords = rectCoords
         self.strength = 0
-        self.dexterity = 0
+        self.dex = 0
         self.effects = {"poision": 0, "strength": 0, "dexterity": 0, }
         self.hitAnimationList = []
         self.spriteCounter = 0
@@ -27,7 +28,8 @@ class Enemy:
         self.attackRange = attackRange
         self.empowerRange = empowerRange
         self.debuffRange = debuffRange
-        self.intention = None
+        self.intention = "Attack"
+        self.hasAttackedRecently = False
 
     def __repr__(self):
         return f"This enemy has is {self.name} that has {self.health} with {self.type}"
@@ -46,8 +48,10 @@ class Enemy:
         return self.health <= 0
 
     def attack(self, player, damage):
-        player.health = (player.currentShield + player.health) - \
+        player.health = (player.currentDefense + player.health) - \
             (damage + self.strength)
+        if player.health > player.maxHealth:
+            player.health = player.maxHealth
 
     def debuff(self, player, debuffAmount):
         player.strength -= debuffAmount
@@ -59,7 +63,7 @@ class Enemy:
         self.strength += empowerAmount
 
     def metallicize(self, amount):
-        self.dextertiy += amount
+        self.dexterity += amount
 
     def drawEnemy(self):
         drawRect(self.x, self.y,

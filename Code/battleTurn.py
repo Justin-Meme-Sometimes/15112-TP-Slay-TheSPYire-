@@ -1,6 +1,6 @@
 
 class StateMachine:
-    def __init__(self, player, enemyList, currentTurn):
+    def __init__(self, player, enemyList):
         self.Turns = ["Player Turn", "Player Effects",
                       "Enemy Turn", "Enemy Effects"]
         self.player = player
@@ -34,12 +34,10 @@ class StateMachine:
 
     def removeEnemy(self, enemy):
         if enemy.health <= 0:
-            self.enemylist.pop(enemy)
+            self.enemyList.pop(self.enemyList.index(enemy))
 
     def isCombatOver(self):
         if self.player.health <= 0:
             return "Game Over"
         elif len(self.enemyList) == 0:
             return "Stage Over"
-        else:
-            self.nextTurn(self.currentTurn)

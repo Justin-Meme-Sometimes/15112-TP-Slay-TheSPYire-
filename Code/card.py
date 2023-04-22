@@ -51,10 +51,23 @@ class Card:
         self.x = x
         self.y = y
 
-    def attackEnemy(self, damageAmount, type, target):
+    def attackEnemy(self, damageAmount, type, target, player):
+        damageAmount += player.strength
         if type == "Physical":
-            target.health = (target.health + target.armor) - damageAmount
-            damageDone = (target.health + target.armor) - damageAmount
+
+            if target.currentDefense > damageAmount:
+                currentDamage = target.currentDefense - damageAmount
+            else:
+                currentDamage = damageAmount - target.currentDefense
+            print(target.currentDefense)
+            target.currentDefense -= damageAmount
+            if target.currentDefense < 0:
+                target.currentDefense = 0
+            target.health = (
+                target.health) - currentDamage
+            if target.health > target.maxHealth:
+                target.health = target.maxHealth
+            damageDone = (target.health + target.currentDefense) - damageAmount
             return f"Damage Done was {damageDone}"
         if type == "Poison":
             target.effects["poision"] += 1
@@ -72,9 +85,9 @@ class AttackCard(Card):
         super.__init__(image, energyCost, skill, name)
         super.cardType = "attack"
 
-    def attackEnemy(damageAmount, type, target):
+    def attacksEnemy(self, damageAmount, type, target):
         if type == "Physical":
-            target.health = (target.health + target.armor) - damageAmount
+            target.health = (target.health + target.armor) - (damageAmount)
             damageDone = (target.health + target.armor) - damageAmount
             return f"Damage Done was {damageDone}"
         if type == "Poison":
@@ -95,8 +108,11 @@ class Deck:
     def shuffle(self):
         random.shuffle(self.cards)
 
-    def add(self, card,):
-        card.x = self.cards[-1].x + 40
+    def add(self, card):
+        if len(self.cards) > 1:
+            card.x = self.cards[-1].x + 40
+        else:
+            card.x = 40+70
         self.cards.append(card)
 
     def discard(self, card):
