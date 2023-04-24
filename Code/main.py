@@ -27,16 +27,14 @@ def onAppStart(app):
     # n2 = Node("Shop", False, None, 1)
     # app.nodes = [n1, n2]
     # app.map = Map(app.nodes, 1)
-    app.enemyIntentions = ["Attack"]
-    # "Empower",
-    # "Defend", "Debuff"]
+    app.enemyIntentions = ["Attack", "Empower", "Defend", "Debuff"]
     app.player = Player(100, 4, 0, (90, 120),
                         "images/PlayerSprite.png", 90, 200)
     app.ogPlayerPos = (90, 200)
     app.e1 = Enemy("Python", 100, "images/PythonEnemySprite.png",
-                   "images/PythonEnemySpriteSheetHit.png", "Easy Mob", 240, 200, (60, 80), [3, 7], [300, 500], [2, 3], [4, 5], [3, 5])
+                   "images/PythonEnemySpriteSheetHit.png", "Easy Mob", 240, 200, (60, 80), [3, 7], [3, 20], [2, 3], [4, 5], [3, 5])
     app.e2 = Enemy("Lemon Slime", 50, "images/Lemon Slime.png",
-                   "images/PythonEnemySpriteSheetHit.png", "Easy Mob", 340, 200, (60, 80), [3, 7], [300, 500], [2, 3], [4, 5], [3, 5])
+                   "images/PythonEnemySpriteSheetHit.png", "Easy Mob", 340, 200, (60, 80), [3, 7], [3, 20], [2, 3], [4, 5], [3, 5])
     app.enemyAttackTimer = 0
     # app.e1.instaniateSpritesHitSheet()
     # app.enemyWasRecentlyHit = False
