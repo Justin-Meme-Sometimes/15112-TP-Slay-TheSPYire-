@@ -7,9 +7,10 @@ from player import Player
 
 
 class Enemy:
-    def __init__(self, name, health, image, type, x, y, rectCoords, defenseRange, attackRange, empowerRange, empowerType, debuffRange):
+    def __init__(self, name, health, image, hitImage, type, x, y, rectCoords, defenseRange, attackRange, empowerRange, empowerType, debuffRange, intentionList):
         self.name = name
         self.maxHealth = health
+        self.hitImage = hitImage
         self.health = health
         self.image = image
         self.type = type
@@ -29,12 +30,17 @@ class Enemy:
         self.debuffRange = debuffRange
         self.intention = "Attack"
         self.hasAttackedRecently = False
+        self.wasHitRecently = False
+        self.enemyIntentions = intentionList
 
     def __repr__(self):
         return f"This enemy has is {self.name} that has {self.health} with {self.type}"
 
     def doSkill(self, action, parameter):
         return action(parameter)
+
+    def enemyHit(self):
+        pass
 
     def instaniateSpritesHitSheet(self):
         spritestrip = openImage(self.hitSpriteSheet)
@@ -74,11 +80,11 @@ class Enemy:
     def metallicize(self, amount):
         self.dexterity += amount
 
-    def drawEnemy(self):
-        drawRect(self.x, self.y,
+    def drawEnemy(self, image, offsetX, offsetY):
+        drawRect(self.x + offsetX, self.y + offsetY,
                  self.rectCoords[0]+1, self.rectCoords[1]+1, fill=None, borderWidth=10)
-        temp = Image.open(self.image)
-        drawImage(self.image, self.x, self.y,
+        temp = Image.open(image)
+        drawImage(image, self.x + offsetX, self.y + offsetY,
                   width=self.rectCoords[0], height=self.rectCoords[1])
 
     def drawEnemyAttack(self, enemyAnimationList):

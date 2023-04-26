@@ -93,18 +93,19 @@ class Panel:
 
 
 class IntentionIcon:
-    def __init__(self, app, sizeTuple, image, enemy):
+    def __init__(self, app, sizeTuple, image, name):
         self.app = app
-        self.enemy = enemy
-        self.x = enemy.x
-        self.y = enemy.y + 30
         self.enabled = True
         self.sizeTuple = sizeTuple
         self.image = image
+        self.name = name
 
-    def drawIcon(self, app):
+    @staticmethod
+    def drawIcon(enemy):
         # This will assume that the banner will usually be bigger for the buttons
-        drawRect(self.x, self.y, self.sizeTuple[0], self.sizeTuple[1])
-        temp = Image.open(self.image)
-        drawImage(self.image, self.x, self.y,
-                  width=self.sizeTuple[0], height=self.sizeTuple[1])
+        drawRect(enemy.x, enemy.y + 20, 40, 40, fill=None)
+
+        temp = Image.open(f"{enemy.intention}Intent.png")
+        image = f"{enemy.intention}Intent.png"
+        drawImage(image, enemy.x, enemy.y + 20,
+                  width=40, height=40)

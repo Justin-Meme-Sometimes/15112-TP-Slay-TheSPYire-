@@ -6,8 +6,9 @@ import random
 
 
 class Player:
-    def __init__(self, health, energy, cardPlayedPerTurn, rectSize, image, x, y, relicList):
+    def __init__(self, health, energy, cardPlayedPerTurn, rectSize, image, imageHit, x, y, relicList):
         self.health = health
+        self.imageHit = imageHit
         self.maxHealth = health
         self.energy = energy
         self.cardPlayedPerTurn = cardPlayedPerTurn
@@ -24,12 +25,13 @@ class Player:
         self.attacksDone = 0
         self.cardPlayed = None
         self.gold = 0
+        self.wasHitRecently = False
 
-    def drawPlayer(self):
-        drawRect(self.x, self.y,
+    def drawPlayer(self, image, offsetX, offsetY):
+        drawRect(self.x + offsetX, self.y + offsetY,
                  self.rectSize[0]+1, self.rectSize[1]+1, fill=None)
-        temp = Image.open(self.image)
-        drawImage(self.image, self.x, self.y,
+        temp = Image.open(image)
+        drawImage(image, self.x + offsetX, self.y + offsetY,
                   width=self.rectSize[0], height=self.rectSize[1])
 
     def isPlayerAlive(self):
