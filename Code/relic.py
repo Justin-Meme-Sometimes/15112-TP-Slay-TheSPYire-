@@ -16,7 +16,8 @@ from Stage import Map
 
 
 class relic:
-    relicSet = {"Red Skull", "Kunai", "Anchor", "Nunchaku", "The Boot"}
+    relicSet = {"Red Skull", "Kunai", "Anchor",
+                "Nunchaku", "The Boot", "Bloodied Cross", "Chains"}
 
     def __init__(self, name, type, rectCoords, image, cost):
         self.name = name
@@ -51,17 +52,27 @@ class relic:
                     if player.health <= (player.maxHealth / 2) and relic.applied == False:
                         relic.applied = True
                         player.strength += 5
-                    if player.health <= (player.maxHealth / 2):
-                        relic.applied = True
+                    if player.health >= (player.maxHealth / 2):
+                        relic.applied = False
                 elif relic.name == "Kunai":
                     if turn == "Player Turn":
                         player.dex += 1
-                elif relic.name == "Anchor" and relic.applied == False:
-                    if turn == "Player Turn":
+                elif relic.name == "Anchor":
+                    if turn == "Player Turn" and relic.applied == False:
                         player.currentDefense += 10
+                        relic.applied = True
                 elif relic.name == "Nunchaku":
                     if player.attacksDone % 10 == 0 and player.attacksDone >= 10:
                         if turn == "Player Turn":
                             player.energy += 1
+                elif relic.name == "Bloodided Cross":
+                    player.canCrit == True
+                elif relic.name == "Chains":
+                    player.strength = player.strength + 3
+                    player.health = player.health - 5
+                elif relic.name == "The Boot":
+                    player.health += 10
+                    if player.health > player.maxHealth:
+                        player.health = player.maxHealth
         # player.cardPlayed = None
         # player.cardPlayed.damageDone = 0

@@ -26,6 +26,8 @@ class Player:
         self.cardPlayed = None
         self.gold = 0
         self.wasHitRecently = False
+        self.canCrit = False
+        self.forbiddenCards = []
 
     def drawPlayer(self, image, offsetX, offsetY):
         drawRect(self.x + offsetX, self.y + offsetY,

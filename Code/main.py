@@ -18,6 +18,11 @@ from relic import relic
 
 
 def onAppStart(app):
+    app.stage = Stage("StartScreen", None, None, None, None, None, None)
+    app.startGame = False
+    app.startButton = Button((100, 50), 160, 220,
+                             "images/StartButton.png", "startButton")
+    app.floor = 1
 
     app.relics = totalRelicList(app)
     app.gold = 0
@@ -32,11 +37,15 @@ def onAppStart(app):
     app.d = Deck([])
     for card in initialCardList(app):
         app.d.add(card)
+    app.deckCoords = [(c.x, c.y) for c in app.d.cards]
     app.stage = Stage("Combat", app.stageNumber, app.enemies,
                       app.backgroundImage, app.player, app.d, app.gold)
     app.deckCoords = [(c.x, c.y) for c in app.stage.deck.cards]
-    app.ogEnemyPositions = [(enemy.x, enemy.y) for enemy in app.stage.enemies]
+    app.ogEnemyPositions = [(enemy.x, enemy.y)
+                            for enemy in app.stage.enemies]
     app.skillPoints = 0
+    app.gameOver = False
+    app.previousStage = app.stage.type
     intentIconList(app)
     initializeStage(app)
 
@@ -48,7 +57,8 @@ def initializeStage(app):
     app.enemyAttackTimer = 0
     app.enemyIntentions = ["Attack", "Empower", "Defend", "Debuff"]
     app.cardLine = False
-    app.deckCoords = [(c.x, c.y) for c in app.stage.deck.cards]
+    if app.stage.deck != None:
+        app.deckCoords = [(c.x, c.y) for c in app.stage.deck.cards]
     app.currCardCoords = (None, None)
     app.globalMouseX = 0
     app.globalMouseY = 0
@@ -69,14 +79,20 @@ def initializeStage(app):
     app.playerAttackTimer = 0
     app.stateMachine = StateMachine(app.stage.player, app.stage.enemies)
     app.stageWon = False
-    app.ogEnemyPositions = [(enemy.x, enemy.y) for enemy in app.stage.enemies]
-    app.stage.player.x, app.stage.player.y = app.ogPlayerPos[
-        0], app.ogPlayerPos[1]
+    if app.stage.enemies != None:
+        app.ogEnemyPositions = [(enemy.x, enemy.y)
+                                for enemy in app.stage.enemies]
+    if app.stage.player != None:
+        app.stage.player.x, app.stage.player.y = app.ogPlayerPos[
+            0], app.ogPlayerPos[1]
     app.showEndBanner = False
     app.enemyHitTimer = 0
     app.playerHitTimer = 0
-    app.enemyImage = app.stage.enemies[0].image
-    app.floor = 1
+    if app.stage.enemies != None:
+        app.enemyImage = app.stage.enemies[0].image
+
+    app.bombEffect = False
+    app.bombCounter = 0
 
 
 def intentIconList(app):
@@ -91,26 +107,98 @@ def intentIconList(app):
 
 
 def startStage(app):
+
+    app.previousStage = app.stage.type
+    if app.gameOver == True:
+        app.stage = Stage("Game Over", app.floor, app.enemies,
+                          app.backgroundImage, app.player, app.d, app.gold)
     app.floor += 1
     # app.enemies.pop()
-    if app.stage.type == "Combat" or app.stage.type == "Boss":
-        app.stage = Stage("Level Up", app.stageNumber, totalEnemyList(app)[1:],
-                          app.backgroundImage, app.player, app.d, app.gold)
+    stageList = ["Combat", "Combat", "Combat", "Level Up", "Shop", "Shop",]
+    if app.gameOver == False:
+        currentStage = random.randrange(0, len(stageList))
+        pickedStage = stageList[currentStage]
+        if app.floor % 5 == 0 and app.floor != 0:
+            pickedStage = "Boss"
+        if pickedStage == "Combat":
+            index = random.randrange(0, len(totalEnemyList(app)))
+            app.enemies = [totalEnemyList(app)[index]]
+            app.d = Deck([])
+            for card in initialCardList(app)[:3]:
+                app.d.add(card)
+            app.enemies[0].health += app.floor * 5
+            app.enemies[0].attackRange[1] += app.floor * 3
+            app.stage = Stage(stageList[currentStage], app.floor, app.enemies,
+                              app.backgroundImage, app.player, app.d, app.gold)
+            initializeStage(app)
+        elif pickedStage == "Shop":
+            app.endshop = Button((60, 20), 320, 130,
+                                 "images/endTurnButton.png", "End Shopping ")
+            app.stage = Stage("Shop", app.stageNumber, totalEnemyList(app)[1:],
+                              app.backgroundImage, app.player, app.d, app.gold)
 
-        app.endshop = Button((60, 20), 320, 130,
-                             "images/endTurnButton.png", "End Shopping ")
-        initializeStage(app)
+            initializeStage(app)
+        elif pickedStage == "Level Up":
+            app.levelUpButtons = makeLevelUpButtons(app)
+            app.endshop = Button((60, 20), 320, 130,
+                                 "images/endTurnButton.png", "End Shopping ")
+            app.stage = Stage("Level Up", app.stageNumber, totalEnemyList(app)[1:],
+                              app.backgroundImage, app.player, app.d, app.gold)
 
-    elif app.stage.type == "Shop":
-        app.d = Deck([])
-        for card in initialCardList(app):
-            app.d.add(card)
+        if pickedStage == "Boss":
+            index = random.randrange(0, len(totalBossList(app)))
+            app.enemies = [totalBossList(app)[index]]
+            app.enemies[0].health += app.floor * 5
+            app.enemies[0].attackRange[1] += app.floor * 3
+            app.d = Deck([])
+            for card in initialCardList(app)[:4]:
+                app.d.add(card)
+            app.stage = Stage("Boss", app.floor, app.enemies,
+                              app.backgroundImage, app.player, app.d, app.gold)
+            initializeStage(app)
+    # if app.stage.type == "Combat" or app.stage.type == "Boss":
+      # print("hello")
+
+    # elif app.stage.type == "Shop":
+       # app.d = Deck([])
+        # for card in initialCardList(app):
+        #   app.d.add(card)
 
         # prepareForNextPlayerTurn(app)
-        app.stage = Stage("Combat", app.stageNumber, totalEnemyList(app),
-                          app.backgroundImage, app.player, app.d, app.gold)
-        initializeStage(app)
+      #  app.stage = Stage("Combat", app.stageNumber, totalEnemyList(app),
+        # app.backgroundImage, app.player, app.d, app.gold)
+     #   initializeStage(app)
+
+
+def makeLevelUpButtons(app):
+    app.lvlUp1 = Button((20, 20), 260, 220,
+                        "images/PlusButton.png", "HealButton")
+    app.lvlUp2 = Button((20, 20), 260, 245,
+                        "images/PlusButton.png", "StrengthButton")
+    app.lvlUp3 = Button((20, 20), 260, 270,
+                        "images/PlusButton.png", "HealthButton")
+    app.lvlUp4 = Button((20, 20), 260, 295,
+                        "images/PlusButton.png", "DexButton")
+    return [app.lvlUp1, app.lvlUp2, app.lvlUp3, app.lvlUp4]
     # TODO load next stage
+
+
+def levelUpButtonHandler(app, mouseX, mouseY):
+    for button in app.levelUpButtons:
+        if button.isButtonClicked(app, mouseX, mouseY):
+            if (app.skillPoints >= 1):
+                app.skillPoints -= 1
+                player = app.stage.player
+                if button.buttonName == "HealButton":
+                    player.health += 10
+                    if player.health > player.maxHealth:
+                        player.health = player.maxHealth
+                elif button.buttonName == "StrengthButton":
+                    player.strength += 3
+                elif button.buttonName == "HealthButton":
+                    player.maxHealth += 20
+                elif button.buttonName == "DexButton":
+                    player.dex += 2
 
 
 def drawBackground(app):
@@ -122,44 +210,63 @@ def drawBackground(app):
 
 
 def totalRelicList(app):
-    app.r1 = relic("Red Skull", "Normal", (40, 40), "images/RedSkull.png", 50)
+    app.r1 = relic("Red Skull", "Normal", (40, 40), "images/RedSkull.png", 100)
     app.r2 = relic("Kunai", "Normal", (40, 40), "images/Kunai.png", 50)
-    app.r3 = relic("Anchor", "Normal", (40, 40), "images/Anchor.png", 50)
-    app.r4 = relic("Nunchaku", "Normal", (40, 40),  "images/Nunchaku.png", 50)
-    app.r5 = relic("The Boot", "Normal", (40, 40), "images/The Boot.png", 50)
-    return [app.r1, app.r2, app.r3, app.r4, app.r5]
+    app.r3 = relic("Anchor", "Normal", (40, 40), "images/Anchor.png", 20)
+    app.r4 = relic("Nunchaku", "Normal", (40, 40),  "images/Nunchaku.png", 30)
+    app.r5 = relic("The Boot", "Normal", (40, 40), "images/The Boot.png", 60)
+    app.r6 = relic("Bloodied Cross", "Normal", (40, 40),
+                   "images/BloodiedCross.png", 200)
+    app.r7 = relic("Chains", "Normal", (40, 40),
+                   "images/Chains.png", 50)
+    return [app.r1, app.r2, app.r3, app.r4, app.r5, app.r6, app.r7]
+
+
+def totalBossList(app):
+    app.b1 = Enemy("Flamingo", 300,  "images/FlamingoBoss.png", "images/FlamingoBossHit.png", "Boss Mob",
+                   240, 200, (120, 120), [15, 25], [10, 20], [0, 5], [3, 10], [4, 5], ["Defend", "Attack", "Attack", "Attack"])
+    app.b2 = Enemy("Money", 275, "images/coinSprite.png", "images/coinSpriteHit.png", "Boss Mob",
+                   240, 200, (120, 120), [15, 50], [10, 20], [0, 5], [5, 5], [3, 5], ["Attack", "Defend", "Defend", "Defend"])
+    app.b3 = Enemy("Neptunes Trident", 200, "images/NeptunesTridentBoss.png", "images/NeptunesTridentBossHit.png", "Boss Mob",
+                   240, 220, (100, 100), [10, 15], [20, 40], [3, 2], [3, 3], [1, 2], ["Empower", "Attack", "Attack", "Attack"])
+    return [app.b1, app.b2, app.b3]
 
 
 def totalEnemyList(app):
 
     # All assets were made by me and all code was written by me
-    app.e1 = Enemy("Python", 100, "images/PythonEnemySprite.png", "images/PythonEnemySprite.png",
-                   "Easy Mob", 240, 250, (60, 80), [3, 7], [3, 15], [2, 3], [4, 5], [3, 5], ["Attack", "Attack", "Attack", "Debuff"])
+    app.e1 = Enemy("Python", 100, "images/PythonEnemySprite.png", "images/PythonEnemySpriteHit.png",
+                   "Easy Mob", 240, 250, (60, 80), [3, 9], [3, 15], [2, 3], [4, 5], [3, 5], ["Attack", "Attack", "Attack", "Debuff"])
     app.e2 = Enemy("Lemon Slime", 50, "images/Lemon Slime.png", "images/Lemon SlimeHit.png",
-                   "Easy Mob", 240, 260, (60, 80), [3, 7], [3, 15], [2, 3], [4, 5], [3, 5], ["Attack", "Attack", "Debuff", "Debuff"])
+                   "Easy Mob", 240, 260, (60, 80), [5, 10], [3, 15], [2, 3], [4, 5], [3, 5], ["Attack", "Attack", "Debuff", "Debuff"])
     app.e3 = Enemy("Turtle", 150, "images/Turtle Enemy.png", "images/Turtle EnemyHit.png", "Easy Mob",
-                   240, 240, (100, 100), [5, 10], [2, 5], [0, 1], [5, 10], [2, 5], ["Attack", "Defend", "Defend", "Debuff"])
+                   240, 240, (100, 100), [5, 10], [5, 10], [0, 1], [5, 10], [2, 5], ["Attack", "Defend", "Defend", "Debuff"])
     app.e4 = Enemy("Mimic", 50,  "images/MimicEnemy.png", "images/MimicEnemyHit.png", "Easy Mob",
                    240, 200, (120, 120), [1, 2], [10, 20], [0, 5], [3, 10], [4, 5], ["Attack", "Debuff", "Debuff", "Debuff"])
     app.e5 = Enemy("Merman", 200, "images/MermanSprite.png", "images/MermanSpriteHit.png", "Easy Mob",
                    240, 200, (120, 120), [5, 5], [10, 12], [0, 5], [5, 5], [3, 5], ["Attack", "Empower", "Attack", "Empower"])
     app.e6 = Enemy("HauntedHelmet", 75, "images/HelmetEnemy.png", "images/HelmetEnemyHit.png", "Easy Mob",
-                   240, 220, (100, 100), [20, 21], [0, 5], [3, 2], [3, 3], [1, 2], ["Attack", "Defend", "Debuff", "Debuff"])
-    # app.e7 = Enemy("")
+                   240, 220, (100, 100), [20, 21], [1, 5], [3, 2], [3, 3], [1, 2], ["Attack", "Defend", "Debuff", "Debuff"])
 
     return [app.e1, app.e2, app.e3, app.e4, app.e5, app.e6]
 
 
+def forbiddenCards(app):
+    app.BOMB = Card("images/BombCard.png", 3, 4, "Bomb Card", (40, 40), app)
+    app.RUN = Card("images/RunCard.png", 0, 4, "Run Card," (40, 40), app)
+    return [app.BOMB, app.RUN]
+
+
 def initialCardList(app):
-    app.ATK = Card("images/AttackCard.png", 0, 4, "Attack Card", (40, 40), app)
-    app.ATK2 = Card("images/AttackCard.png", 0, 4,
+    app.ATK = Card("images/AttackCard.png", 1, 4, "Attack Card", (40, 40), app)
+    app.ATK2 = Card("images/AttackCard.png", 1, 4,
                     "Attack Card", (40, 40), app)
     app.DEX = Card("images/DexCard.png", 1, 3, "Dex Card", (40, 40), app)
-    app.DEF = Card("images/DefenseCard.png", 0, 2,
+    app.DEF = Card("images/DefenseCard.png", 2, 2,
                    "Defense Card", (40, 40), app)
     app.STR = Card("images/StrengthCard.png", 1, 2,
                    "Strength Card", (40, 40), app)
-    return [app.ATK, app.ATK2, app.DEF, app.STR]
+    return [app.ATK, app.ATK2, app.DEF, app.STR, app.DEX]
 
 
 def buttons(app):
@@ -170,8 +277,19 @@ def buttons(app):
 def prepareForNextPlayerTurn(app):
     app.player.currentDefense = 0
     app.player.energy = app.player.maxEnergy
-    start = random.randrange(0, len(initialCardList(app)))
-    card = initialCardList(app)[start]
+    start = random.randrange(0, 19)
+    # card = initialCardList(app)[start]
+    card = initialCardList(app)[0]
+    if 0 <= start <= 9:
+        card = initialCardList(app)[0]
+    elif 9 < start <= 13:
+        card = initialCardList(app)[1]
+    elif 13 < start <= 17:
+        card = initialCardList(app)[2]
+    elif 17 < start <= 18:
+        card = initialCardList(app)[3]
+    elif 18 < start < 19:
+        card = initialCardList(app)[4]
 
     if len(app.d.cards) < 7:
         app.d.add(card)
@@ -192,6 +310,13 @@ def prepareForNextPlayerTurn(app):
             # 0, len(app.enemyIntentions))]
         print(enemy.intention)
     app.turnCount += 1
+    if app.bombEffect == True:
+        if app.bombCounter < 3:
+            app.bombCounter += 1
+        elif app.bombCounter <= 3:
+            app.stage.enemies[0].health -= 50
+            app.bombEffet = False
+
     relic.relicHandler(app.stage.player, app.turn)
 
 
@@ -298,9 +423,10 @@ def playPEffectsAnimation(app, player, enemies):
 
 
 def redrawAll(app):
+
     drawBackground(app)
     drawLabel(f"current Floor: {app.floor}", 250, 50)
-    if app.stage.type == "Combat":
+    if app.stage.type == "Combat" or app.stage.type == "Boss":
         if app.stage.player.isPlayerAlive():
             app.et.drawButton(app)
             if app.turn == "Player Turn":
@@ -341,11 +467,11 @@ def redrawAll(app):
             drawLabel(f"Gold: {app.stage.player.gold}",
                       app.stage.player.x+20, app.stage.player.y-55)
             for enemy in app.stage.enemies:
-                drawLabel(f"Health: {enemy.health}", enemy.x, enemy.y - 40)
+                drawLabel(f"Health: {enemy.health}", enemy.x, enemy.y - 70)
                 drawLabel(f"Shield: {enemy.currentDefense}",
-                          enemy.x, enemy.y - 20)
+                          enemy.x, enemy.y - 50)
                 drawLabel(
-                    f"Eff: STR: {enemy.strength} DEX: {enemy.dex}", enemy.x, enemy.y - 5)
+                    f"Eff: STR: {enemy.strength} DEX: {enemy.dex}", enemy.x, enemy.y - 30)
         else:
             drawLabel("You Lost", 200, 200)
         if app.showEndBanner == True:
@@ -359,17 +485,38 @@ def redrawAll(app):
         app.endshop.drawButton(app)
         drawShop(app)
     elif app.stage.type == "Level Up":
+        app.endshop.drawButton(app)
         drawLevelUpScreen(app)
+    if app.stage.type == "Game Over":
+        drawGameOverScreen(app)
+    if app.stage.type == "StartScreen":
+        drawStartScreen(app)
+        app.startButton.drawButton(app)
+
+
+def drawGameOverScreen(app):
+    drawLabel("You Lost", 150, 200, size=40)
+    drawLabel(f"You lasted {app.floor} floors", 150, 250)
+
+
+def drawStartScreen(app):
+    backgroundImage = f"images/background2.png"
+    temp = Image.open(backgroundImage)
+    drawImage(backgroundImage, 0, 0,
+              width=400, height=400)
+    drawLabel("Slay the Spyre", 200, 200, size=50)
 
 
 def drawLevelUpScreen(app):
     drawLabel("Level Up", 200, 180, size=30)
     drawLabel("Heal", 200, 220, size=15)
-    drawLabel("Level Strength", 200, 240, size=15)
-    drawLabel("Level Health", 200, 260, size=15)
-    drawLabel("Level Dex", 200, 280, size=15)
-    drawLabel("Level Defense", 200, 300, size=15)
-    drawLabel("Level Attack Type", 200, 320, size=15)
+    drawLabel("Level Strength", 200, 250, size=15)
+    drawLabel("Level Health", 200, 280, size=15)
+    drawLabel("Level Dex", 200, 300, size=15)
+    drawLabel(f"Current skill points {app.skillPoints}", 80, 100)
+
+    for button in app.levelUpButtons:
+        button.drawButton(app)
 
 
 def drawEndBanner(app):
@@ -385,9 +532,10 @@ def drawShop(app):
 
     for relic in app.relics:
         offset += 50
-        relic.drawRelic(50 + offset, 200)
+        relic.drawRelic(offset, 200)
         # relic.x, relic.y = 50 + offset, 150
-        drawLabel("50 C", relic.x, relic.y - 20)
+        drawLabel(f"{relic.cost}C", relic.x, relic.y - 20)
+    drawLabel(f"current Gold {app.stage.player.gold}", 200, 250, size=20)
 
 
 def onKeyPress(app, key):
@@ -395,9 +543,13 @@ def onKeyPress(app, key):
 
 
 def onStep(app):
-    if app.stateMachine.isCombatOver(app.stage) == "Stage Over":
-        startStage(app)
-    if app.stage.type == "Combat":
+    if app.gameOver == False:
+        if app.stateMachine.isCombatOver(app.stage) == "Stage Over":
+            startStage(app)
+        if app.stateMachine.isCombatOver(app.stage) == "Game Over":
+            app.gameOver = True
+            startStage(app)
+    if app.stage.type == "Combat" or app.stage.type == "Boss":
         if app.playerAnimationCurrently:
             app.stepsPerSecond = 20
         if app.clickedCard != None:
@@ -410,9 +562,21 @@ def onStep(app):
             if removedEnemy != None:
                 app.skillPoints += 1
                 if removedEnemy.name == "Mimic":
-                    app.stage.player.gold += 50
+                    app.stage.player.gold += 90
+                elif removedEnemy.type == "Boss":
+                    if app.removed.Enemy.name == "Money":
+                        app.stage.player.gold += 200
+                    if app.removed.Enemy.name == "Flamingo":
+                        app.stage.player.strength += 20
+                    app.stage.player.health = app.stage.player.maxHealth
+                    app.stage.player.gold += 150
+                    app.skillPoints += 4
+                    # app.stage.player.forbiddenCards.append(
+                    # forbiddenCards(app)[random.randrange(0, 1)])
+                    # app.stage.player.forbiddenCards = list(
+                    # set(app.stage.player.forbiddenCards))
                 else:
-                    app.stage.player.gold += 20
+                    app.stage.player.gold += 50
         if app.displayLowEnergy == True:
             app.lowEnergyCounter += 1
             if app.lowEnergyCounter == 75:
@@ -421,13 +585,13 @@ def onStep(app):
         if app.turnHandlerBegin == True:
             # print(app.turnTimer)
             app.turnTimer += 1
-            if app.turnTimer == 75 and app.turn == "Player Effects":
+            if app.turnTimer == 25 and app.turn == "Player Effects":
                 playerEffectsTurn(app)
                 app.turnTimer = 0
-            if app.turnTimer == 75 and app.turn == "Enemy Turn":
+            if app.turnTimer == 25 and app.turn == "Enemy Turn":
                 enemyTurn(app)
                 app.turnTimer = 0
-            if app.turnTimer == 75 and app.turn == "Enemy Effects":
+            if app.turnTimer == 25 and app.turn == "Enemy Effects":
                 enemyEffectsTurn(app)
                 app.turnTimer = 0
         if app.playerAttackAnim == True:
@@ -475,19 +639,27 @@ def currentHandDiscard(app):
 
 def cardSkillHandler(app, card, enemy, player):
     if card.name == "Strength Card":
-        player.strength += 1
+        player.strength += 2
     elif card.name == "Attack Card":
         card.attackEnemy(
-            200, "Physical", enemy, app.stage.player)
+            45, "Physical", enemy, app.stage.player)
+        if app.stage.player.canCrit == True:
+            card.attackEnemy(
+                75, "Physical", enemy, app.stage.player)
         player.attacksDone += 1
     elif card.name == "Defense Card":
-        player.currentDefense += 5
+        player.currentDefense += 10
     elif card.name == "Dex Card":
         player.dex += 3
+    elif card.name == "The Bomb":
+        app.bombEffect = True
+        app.bombCounter = 0
+    elif card.name == "Run":
+        startStage(app)
 
 
 def onMousePress(app, mouseX, mouseY):
-    if app.stage.type == "Combat":
+    if app.stage.type == "Combat" or app.stage.type == "Boss":
         app.previousClicked = app.clickedCard
         app.clickedCard = app.d.isTouchingCard(app, mouseX, mouseY)
 
@@ -505,8 +677,9 @@ def onMousePress(app, mouseX, mouseY):
                     currentHandDiscard(app)
                 else:
                     app.displayLowEnergy = True
-        if (app.et.isButtonClicked(app, mouseX, mouseY)):
-            app.et.buttonAction(endTurn(app))
+        if app.turn == "Player Turn":
+            if (app.et.isButtonClicked(app, mouseX, mouseY)):
+                app.et.buttonAction(endTurn(app))
         if app.clickedCard != None:
             app.clickedCard.clicked = not app.clickedCard.clicked
     if app.stage.type == "Shop":
@@ -517,10 +690,17 @@ def onMousePress(app, mouseX, mouseY):
                     app.relics.remove(relic)
         if app.endshop.isButtonClicked(app, mouseX, mouseY):
             startStage(app)
+    if app.stage.type == "Level Up":
+        levelUpButtonHandler(app, mouseX, mouseY)
+        if app.endshop.isButtonClicked(app, mouseX, mouseY):
+            startStage(app)
+    if app.stage.type == "StartScreen":
+        if app.startButton.isButtonClicked(app, mouseX, mouseY):
+            app.startGame = True
 
 
 def onMouseMove(app, mouseX, mouseY):
-    if app.stage.type == "Combat":
+    if app.stage.type == "Combat" or app.stage.type == "Boss":
         app.currentCard = app.d.isTouchingCard(app, mouseX, mouseY)
         app.globalMouseX, app.globalMouseY = mouseX, mouseY
         if app.currentCard != None and app.currentCard.isMouseTouching(app, mouseX, mouseY):

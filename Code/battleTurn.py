@@ -39,7 +39,7 @@ class StateMachine:
             return self.enemyList.pop(self.enemyList.index(enemy))
 
     def isCombatOver(self, stage):
-        if self.player.health <= 0 and stage.type == "Combat":
+        if self.player.health <= 0:
             return "Game Over"
-        elif len(self.enemyList) == 0 and stage.type != "Shop" and stage.type == "Combat":
+        elif len(self.enemyList) == 0 and stage.type != "Shop" and (stage.type == "Combat" or stage.type == "Boss"):
             return "Stage Over"

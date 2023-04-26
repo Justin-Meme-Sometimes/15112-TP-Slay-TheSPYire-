@@ -53,6 +53,7 @@ class Enemy:
         return self.health <= 0
 
     def attack(self, target, damageAmount):
+        print(f"raw damage amount {damageAmount}")
         if target.currentDefense > damageAmount:
             currentDamage = target.currentDefense - damageAmount
         else:

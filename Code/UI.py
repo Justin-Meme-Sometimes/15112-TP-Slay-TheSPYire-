@@ -35,7 +35,7 @@ class Button:
 
     def drawButton(self, app):
         drawRect(self.x, self.y,
-                 self.sizeTuple[0], self.sizeTuple[1], fill="Red")
+                 self.sizeTuple[0], self.sizeTuple[1], fill=None)
         temp = Image.open(self.image)
         drawImage(self.image, self.x, self.y,
                   width=self.sizeTuple[0], height=self.sizeTuple[1])
@@ -105,7 +105,7 @@ class IntentionIcon:
         # This will assume that the banner will usually be bigger for the buttons
         drawRect(enemy.x, enemy.y + 20, 40, 40, fill=None)
 
-        temp = Image.open(f"{enemy.intention}Intent.png")
-        image = f"{enemy.intention}Intent.png"
-        drawImage(image, enemy.x, enemy.y + 20,
+        temp = Image.open(f"images/{enemy.intention}Intent.png")
+        image = f"images/{enemy.intention}Intent.png"
+        drawImage(image, enemy.x + 30, enemy.y - 30,
                   width=40, height=40)

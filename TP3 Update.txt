@@ -1,0 +1,35 @@
+Last and Final Update:
+            Added Stages:
+                4 Main Stages:
+                    Combat: Fight Normal Enemies
+                    Shop: Buy Shopping Items:
+                    Level UP: level up certain stats for your character
+                    Boss: Encounter a boss
+                    you will encounter a boss every 5 stages or so but everything else is completely random for when it shows up
+            Added Leveling UP:
+                you can now heal yourself after a stage
+                you can also now level your max health, strength, and dex
+                in the shop you can buy relics, these relics are registered right before the player cast cards
+                speaking of buying items, killing enemies now gets you gold and the gold depend specifically on the enemy
+                there is now more enemy variety with enemies having tendency to do some actions more than others and higher stat rolls for doing those actions
+                    ex: a defensive enemy will want to defend more and when they defend will defend with a higher defense then others
+                Added Bossses : these bosses have ALOT of health and do alot of damage but they reward you with alot of gold and Statpoints
+                Infinite replayability:
+                    The stages rotate for ever so there is essentially no win condition but you can lose and when you do all progress is lost
+                    the higher you go the stronger the enemies get and the stronger the bosses
+            Art Overhaul:
+                added like 30-40 more assets 
+                enemies, bosses, and players and now have hit animations after being hit or after casting a spell
+                relics all have designs and the player was remodeled
+            Recalulcation and rebalancing:
+                now it is alot easier to attack cards then before and also there is weighted chance system for just about everything now
+                it uses random and checks if the # is within a range to determine whether an attack will/will not happen or whether a stage will load or not
+            Cut Bloat out some code that essentially did nothing was cut out
+                I have no clue how much actually does nothing since this project is pretty sizeable at this point but i'm trying
+            Made the battles 1v1 to compensate for the the low damage numbers and the realtively slow combat i wanted to make it seem more personal
+            and more rewarding and less janky only with 1v1's
+            Added Lots of enemies and bosses
+                before there were only 2 enemies now there is 6 i think 
+                and 3 bosses currently
+        7 Relics i think
+            play the game to find out what they do :)
