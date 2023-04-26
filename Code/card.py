@@ -18,10 +18,12 @@ class Card:
         self.cardType = None
         self.armor = 0
         self.rectCoords = rectCoords
-        self.x = Card.initial + 70
-        Card.initial += 40
+        if self != None:
+            self.x = Card.initial + 70
+            Card.initial += 40
         self.y = 330
         self.clicked = False
+        self.damageDone = 0
 
     def __repr__(self):
         return f"card: {self.energyCost} and {self.name}"
@@ -42,7 +44,7 @@ class Card:
 
     def drawCard(self, app, x, y):
         drawRect(x, y,
-                 self.rectCoords[0]+1, self.rectCoords[1]+1, fill="Red")
+                 self.rectCoords[0]+1, self.rectCoords[1]+1, fill=None)
         temp = Image.open(self.image)
         drawImage(self.image, x, y,
                   width=self.rectCoords[0], height=self.rectCoords[1])
@@ -54,7 +56,6 @@ class Card:
     def attackEnemy(self, damageAmount, type, target, player):
         damageAmount += player.strength
         if type == "Physical":
-
             if target.currentDefense > damageAmount:
                 currentDamage = target.currentDefense - damageAmount
             else:
@@ -67,8 +68,8 @@ class Card:
                 target.health) - currentDamage
             if target.health > target.maxHealth:
                 target.health = target.maxHealth
-            damageDone = (target.health + target.currentDefense) - damageAmount
-            return f"Damage Done was {damageDone}"
+            # damageDone = (target.health + target.currentDefense) - damageAmount
+            return f"Damage Done was {currentDamage}"
         if type == "Poison":
             target.effects["poision"] += 1
             return f"Applied Poison to {target.name}"
@@ -109,10 +110,12 @@ class Deck:
         random.shuffle(self.cards)
 
     def add(self, card):
-        if len(self.cards) > 1:
+        if len(self.cards) >= 1:
             card.x = self.cards[-1].x + 40
+            card.y = 330
         else:
             card.x = 40+70
+            card.y = 330
         self.cards.append(card)
 
     def discard(self, card):

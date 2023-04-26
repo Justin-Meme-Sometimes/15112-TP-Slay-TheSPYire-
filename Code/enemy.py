@@ -7,12 +7,11 @@ from player import Player
 
 
 class Enemy:
-    def __init__(self, name, health, image, hitSpriteSheet, type, x, y, rectCoords, defenseRange, attackRange, empowerRange, empowerType, debuffRange):
+    def __init__(self, name, health, image, type, x, y, rectCoords, defenseRange, attackRange, empowerRange, empowerType, debuffRange):
         self.name = name
         self.maxHealth = health
         self.health = health
         self.image = image
-        self.hitSpriteSheet = hitSpriteSheet
         self.type = type
         self.x = x
         self.y = y
@@ -47,11 +46,21 @@ class Enemy:
     def isDead(self):
         return self.health <= 0
 
-    def attack(self, player, damage):
-        player.health = (player.currentDefense + player.health) - \
-            (damage + self.strength)
-        if player.health > player.maxHealth:
-            player.health = player.maxHealth
+    def attack(self, target, damageAmount):
+        if target.currentDefense > damageAmount:
+            currentDamage = target.currentDefense - damageAmount
+        else:
+            currentDamage = damageAmount - target.currentDefense
+        print(target.currentDefense)
+        target.currentDefense -= damageAmount
+        if target.currentDefense < 0:
+            target.currentDefense = 0
+        target.health = (
+            target.health) - currentDamage
+        if target.health > target.maxHealth:
+            target.health = target.maxHealth
+
+        return f"damage: {currentDamage} was done"
 
     def debuff(self, player, debuffAmount):
         player.strength -= debuffAmount
@@ -67,7 +76,7 @@ class Enemy:
 
     def drawEnemy(self):
         drawRect(self.x, self.y,
-                 self.rectCoords[0]+1, self.rectCoords[1]+1, fill="White", borderWidth=10)
+                 self.rectCoords[0]+1, self.rectCoords[1]+1, fill=None, borderWidth=10)
         temp = Image.open(self.image)
         drawImage(self.image, self.x, self.y,
                   width=self.rectCoords[0], height=self.rectCoords[1])

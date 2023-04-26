@@ -1,3 +1,5 @@
+from Stage import Stage
+
 
 class StateMachine:
     def __init__(self, player, enemyList):
@@ -34,10 +36,10 @@ class StateMachine:
 
     def removeEnemy(self, enemy):
         if enemy.health <= 0:
-            self.enemyList.pop(self.enemyList.index(enemy))
+            return self.enemyList.pop(self.enemyList.index(enemy))
 
-    def isCombatOver(self):
-        if self.player.health <= 0:
+    def isCombatOver(self, stage):
+        if self.player.health <= 0 and stage.type == "Combat":
             return "Game Over"
-        elif len(self.enemyList) == 0:
+        elif len(self.enemyList) == 0 and stage.type != "Shop" and stage.type == "Combat":
             return "Stage Over"
