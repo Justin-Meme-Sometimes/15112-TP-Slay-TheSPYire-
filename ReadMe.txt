@@ -38,7 +38,15 @@ Sources:
     the gameplay is loosely based off of slay the spire the video game
     with the nunchuks, the boot, the anchor, the kunai, and the redskull being ideas from slay the spire
     https://slay-the-spire.fandom.com/wiki/Relics
-    
+
+    TP the game is based of off:
+    https://en.wikipedia.org/wiki/Slay_the_Spire
+
+    Loose definition of state machine with turnbased combat:
+    https://gameprogrammingpatterns.com/state.html
+        i'm only citing this to be safe i really didnt use any guides for coming up with the statemachine i just use the basic principles of having each turn be a type of state
+        none of the code is actually copied but more like i derived the idea of the statemachine i used from the general concept.
+        
     the modules i used only included:
         PIL, CMU Graphics, Random, OS (for PIL)
         and path lib
